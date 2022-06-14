@@ -17,7 +17,7 @@ jobs:
 
     steps:
     - name: List dir
-      run:
+      run:  |
         cd $GITHUB_WORKSPACE
         ls -a
     - uses: actions/checkout@v3

@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>me.feinrasur</groupId>
-    <artifactId>GuiManager</artifactId>
-    <version>1.0</version>
+    <artifactId>Utils</artifactId>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
 
-    <name>GuiManager</name>
+    <name>Utils</name>
 
     <properties>
         <java.version>1.8</java.version>

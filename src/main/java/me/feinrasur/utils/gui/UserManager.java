@@ -7,14 +7,14 @@ import java.util.HashMap;
 public class UserManager
 {
 
-    private HashMap<Player, BetterGui> currentGui = new HashMap<>();
+    private HashMap<Player, Gui> currentGui = new HashMap<>();
 
     public UserManager()
     {
 
     }
 
-    public void setCurrentGui(Player player, BetterGui gui)
+    public void setCurrentGui(Player player, Gui gui)
     {
         if (!currentGui.containsKey(player))
         {
@@ -24,7 +24,7 @@ public class UserManager
         currentGui.replace(player, gui);
     }
 
-    public BetterGui getCurrentGui(Player player)
+    public Gui getCurrentGui(Player player)
     {
         return currentGui.get(player);
     }

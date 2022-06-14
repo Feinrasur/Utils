@@ -9,7 +9,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.HashMap;
 import java.util.List;
 
-public abstract class BetterGui
+public abstract class Gui
 {
 
     Inventory inventory;
@@ -21,7 +21,7 @@ public abstract class BetterGui
      * @param name Sets the name of the GUI inventory
      */
     @SuppressWarnings("deprecation")
-    public BetterGui(Integer size, String name)
+    public Gui(Integer size, String name)
     {
         inventory = Bukkit.createInventory(null, size, name);
     }

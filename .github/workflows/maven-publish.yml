@@ -4,13 +4,13 @@
 name: Maven Package
 
 on:
-  release:
-    types: [created]
+  push:
+    branches: [master]
 
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     permissions:
       contents: read
       packages: write

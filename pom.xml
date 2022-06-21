@@ -6,7 +6,7 @@
 
     <groupId>me.feinrasur</groupId>
     <artifactId>Utils</artifactId>
-    <version>1.0.0</version>
+    <version>LATEST</version>
     <packaging>jar</packaging>
 
     <name>Utils</name>
@@ -34,16 +34,16 @@
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.18.1-R0.1-SNAPSHOT</version>
+            <version>1.19-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
 
     <distributionManagement>
         <repository>
-            <id>github</id>
-            <name>GitHub Feinrasur Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/Feinrasur/Utils</url>
+            <id>gitlab-maven</id>
+            <url>https://gitlab.com/api/v4/projects/37028939/packages/maven</url>
         </repository>
     </distributionManagement>
+
 </project>

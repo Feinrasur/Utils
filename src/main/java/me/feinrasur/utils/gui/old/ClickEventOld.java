@@ -1,23 +1,23 @@
-package me.feinrasur.utils.gui;
+package me.feinrasur.utils.gui.old;
 
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-public abstract class ClickEvent{
-
-    Gui gui;
+public abstract class ClickEventOld
+{
+    GuiOld gui;
     Integer slot;
     ItemStack shownItem;
-    ClickEventType clickEventType;
 
-    public ClickEvent(Gui gui, Integer slot, ItemStack shownItem, ClickEventType clickEventType)
+    public ClickEventOld(GuiOld gui, Integer slot, ItemStack shownItem)
     {
         this.gui = gui;
         this.slot = slot;
         this.shownItem = shownItem;
 
 
-        me.feinrasur.utils.gui.interfaces.ClickEvent clickEvent = new me.feinrasur.utils.gui.interfaces.ClickEvent() {
+        GuiOld.ClickEvent clickEvent = new GuiOld.ClickEvent()
+        {
             @Override
             public void run(InventoryClickEvent event)
             {
@@ -25,8 +25,9 @@ public abstract class ClickEvent{
             }
         };
 
-        gui.setItem(slot, shownItem, clickEvent, clickEventType);
+        gui.setItem(shownItem, slot, clickEvent);
     }
 
     public abstract void setClickEvent(InventoryClickEvent event);
+
 }

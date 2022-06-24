@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 public class Chat {
 
     public static String prefix = "";
-    private static Pattern hexPattern = Pattern.compile("#([a-fA-F0-9]{6})");
+    private static final Pattern hexPattern = Pattern.compile("#([a-fA-F0-9]{6})");
 
 
     public static void setPrefix(String prefix) {

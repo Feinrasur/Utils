@@ -14,16 +14,14 @@ public class GUIListenerOld implements Listener {
 
     static UserManagerOld manager;
 
-    public GUIListenerOld(JavaPlugin plugin, UserManagerOld userManager)
-    {
+    public GUIListenerOld(JavaPlugin plugin, UserManagerOld userManager) {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
         manager = userManager;
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void onInvClick(InventoryClickEvent event)
-    {
-        if (!(event.getWhoClicked() instanceof  Player)) return;
+    public void onInvClick(InventoryClickEvent event) {
+        if (!(event.getWhoClicked() instanceof Player)) return;
         if (event.getCurrentItem() == null) return;
         if (event.getClickedInventory() == null) return;
         Player player = (Player) event.getWhoClicked();
@@ -34,8 +32,7 @@ public class GUIListenerOld implements Listener {
         Inventory bottomInv = player.getOpenInventory().getBottomInventory();
         Inventory guiInv = gui.getInventory();
         if (guiInv == null) return;
-        if (event.getClickedInventory().equals(player.getInventory()))
-        {
+        if (event.getClickedInventory().equals(player.getInventory())) {
             if (topInv != null && topInv.equals(guiInv))
                 event.setCancelled(true);
         }
@@ -49,12 +46,10 @@ public class GUIListenerOld implements Listener {
         }
         if (!inv.equals(tempInv)) return;
         event.setCancelled(true);
-        if (event.getClick().equals(ClickType.SWAP_OFFHAND) && event.isCancelled())
-        {
+        if (event.getClick().equals(ClickType.SWAP_OFFHAND) && event.isCancelled()) {
             player.getInventory().setItemInOffHand(player.getInventory().getItemInOffHand());
         }
-        if (!event.getClick().equals(ClickType.LEFT) || event.getClick().equals(ClickType.SHIFT_LEFT))
-        {
+        if (!event.getClick().equals(ClickType.LEFT) || event.getClick().equals(ClickType.SHIFT_LEFT)) {
             event.setCancelled(true);
             return;
         }
@@ -67,10 +62,8 @@ public class GUIListenerOld implements Listener {
     }
 
     @EventHandler
-    public void onInvDrag(InventoryDragEvent event)
-    {
-        if (event.getInventory().equals(manager.getCurrentGui((Player) event.getWhoClicked()).getInventory()))
-        {
+    public void onInvDrag(InventoryDragEvent event) {
+        if (event.getInventory().equals(manager.getCurrentGui((Player) event.getWhoClicked()).getInventory())) {
             event.setCancelled(true);
         }
     }

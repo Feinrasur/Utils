@@ -10,14 +10,13 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Config
-{
+public class Config {
 
     private static FileConfiguration config;
     private static JavaPlugin plugin;
 
     public static Map<String, File> customConfigFiles = new HashMap<>();
-    private static Map<String, FileConfiguration> customConfigs = new HashMap<>();
+    private static final Map<String, FileConfiguration> customConfigs = new HashMap<>();
 
     public static void init(JavaPlugin plugin) {
         Config.plugin = plugin;

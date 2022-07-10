@@ -2,23 +2,35 @@ package me.feinrasur.utils.gui;
 
 import me.feinrasur.utils.chat.Chat;
 import me.feinrasur.utils.gui.interfaces.ClickEvent;
+import me.feinrasur.utils.gui.interfaces.CloseEvent;
+import me.feinrasur.utils.gui.interfaces.OpenEvent;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.*;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class GUIListener implements Listener {
 
     static UserManager manager;
+    static JavaPlugin plugin;
+    boolean lockAllInventories = false;
 
-    public GUIListener(JavaPlugin plugin, UserManager userManager) {
-        manager = userManager;
+    public GUIListener(JavaPlugin javaPlugin) {
+        plugin = javaPlugin;
+        manager = new UserManager();
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
+    }
+
+    public GUIListener(JavaPlugin javaPlugin, boolean lockAllInventories) {
+        plugin = javaPlugin;
+        manager = new UserManager();
+        plugin.getServer().getPluginManager().registerEvents(this, plugin);
+        this.lockAllInventories = lockAllInventories;
     }
 
     @EventHandler
@@ -36,17 +48,34 @@ public class GUIListener implements Listener {
     public void inventoryClickEvent(InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player player)) return;
         Gui gui = manager.getCurrentGui(player);
+        if (gui == null) return;
         Inventory guiInv = gui.getInventory();
+        if (guiInv == null) return;
+        InventoryView view = player.getOpenInventory();
+        Inventory topInv = view.getTopInventory();
         Inventory eventInv = event.getClickedInventory();
-        if (!guiInv.equals(eventInv)) return;
-        event.setCancelled(true);
-
+        if (eventInv == null) return;
+        Inventory playerInv = player.getInventory();
+        if (eventInv.equals(playerInv) && topInv.equals(guiInv)) {
+            if (event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
+                event.setCancelled(true);
+                return;
+            }
+            if (lockAllInventories) event.setCancelled(true);
+            if (event.isCancelled())
+                player.getInventory().setItemInOffHand(player.getInventory().getItemInOffHand());
+            return;
+        }
+        if (!eventInv.equals(guiInv)) return;
         Integer slot = event.getSlot();
+        if (event.getClickedInventory().equals(guiInv))
+            event.setCancelled(true);
 
         switch (event.getClick()) {
             case LEFT -> {
                 if (!gui.isLeftClickable()) {
-                    Chat.send(player, "&cDieser Klick ist nicht erlaubt! Bitte benutze einen anderen Klick.");
+                    if (!gui.isIgnoreDeniedClick())
+                        Chat.send(player, "&cDieser Klick ist nicht erlaubt! Bitte benutze einen anderen Klick.");
                     return;
                 }
                 ClickEvent clickEvent = gui.getLeftClickEvent(slot);
@@ -57,7 +86,8 @@ public class GUIListener implements Listener {
             }
             case RIGHT -> {
                 if (!gui.isRightClickable()) {
-                    Chat.send(player, "&cDieser Klick ist nicht erlaubt! Bitte benutze einen anderen Klick.");
+                    if (!gui.isIgnoreDeniedClick())
+                        Chat.send(player, "&cDieser Klick ist nicht erlaubt! Bitte benutze einen anderen Klick.");
                     return;
                 }
                 ClickEvent clickEvent = gui.getRightClickEvent(slot);
@@ -74,7 +104,8 @@ public class GUIListener implements Listener {
                         return;
                     }
                 }
-                Chat.send(player, "&cDieser Klick ist nicht erlaubt! Bitte benutze einen anderen Klick.");
+                if (!gui.isIgnoreDeniedClick())
+                    Chat.send(player, "&cDieser Klick ist nicht erlaubt! Bitte benutze einen anderen Klick.");
                 return;
             }
             case SHIFT_RIGHT -> {
@@ -84,7 +115,8 @@ public class GUIListener implements Listener {
                         clickEvent.run(event);
                         return;
                     }
-                    Chat.send(player, "&cDieser Klick ist nicht erlaubt! Bitte benutze einen anderen Klick.");
+                    if (!gui.isIgnoreDeniedClick())
+                        Chat.send(player, "&cDieser Klick ist nicht erlaubt! Bitte benutze einen anderen Klick.");
                     return;
                 }
             }
@@ -93,7 +125,8 @@ public class GUIListener implements Listener {
                     player.getInventory().setItemInOffHand(player.getInventory().getItemInOffHand());
                 }
                 if (!gui.isSwapOffHandClickable()) {
-                    Chat.send(player, "&cDieser Klick ist nicht erlaubt! Bitte benutze einen anderen Klick.");
+                    if (!gui.isIgnoreDeniedClick())
+                        Chat.send(player, "&cDieser Klick ist nicht erlaubt! Bitte benutze einen anderen Klick.");
                     return;
                 }
                 ClickEvent clickEvent = gui.getSwapOffhandClickEvent(slot);
@@ -108,7 +141,8 @@ public class GUIListener implements Listener {
                     return;
                 }
                 if (!gui.isMiddleClickable()) {
-                    Chat.send(player, "&cDieser Klick ist nicht erlaubt! Bitte benutze einen anderen Klick.");
+                    if (!gui.isIgnoreDeniedClick())
+                        Chat.send(player, "&cDieser Klick ist nicht erlaubt! Bitte benutze einen anderen Klick.");
                     return;
                 }
                 ClickEvent clickEvent = gui.getMiddleClickEvent(slot);
@@ -119,7 +153,8 @@ public class GUIListener implements Listener {
             }
             case NUMBER_KEY -> {
                 if (!gui.isKeyBoardClickable()) {
-                    Chat.send(player, "&cDieser Klick ist nicht erlaubt! Bitte benutze einen anderen Klick.");
+                    if (!gui.isIgnoreDeniedClick())
+                        Chat.send(player, "&cDieser Klick ist nicht erlaubt! Bitte benutze einen anderen Klick.");
                     return;
                 }
                 ClickEvent clickEvent = gui.getKeyboardClickEvent(slot);
@@ -128,6 +163,60 @@ public class GUIListener implements Listener {
                     return;
                 }
             }
+        }
+    }
+
+    /**
+    @EventHandler
+    public void onInvClose(InventoryCloseEvent event) {
+        if (!(event.getPlayer() instanceof Player player)) return;
+        Gui gui = manager.getCurrentGui(player);
+        if (gui == null) return;
+        Inventory guiInv = gui.getInventory();
+        if (guiInv.equals(event.getInventory())) manager.setCurrentGui(player, null);
+    }
+
+
+    @EventHandler
+    public void onDisconnect(PlayerQuitEvent event) {
+        Player player = event.getPlayer();
+        Gui gui = manager.getCurrentGui(player);
+        if (gui != null) manager.setCurrentGui(player, null);
+    }
+
+    @EventHandler
+    public void onDeath(PlayerDeathEvent event) {
+        Player player = event.getPlayer();
+        Gui gui = manager.getCurrentGui(player);
+        if (gui != null) manager.setCurrentGui(player, null);
+    }
+    */
+
+    /**
+     * May not work correctly lol
+     */
+    @EventHandler
+    public void onOpen(InventoryOpenEvent event) {
+        if (!(event.getPlayer() instanceof Player player)) return;
+        Gui gui = manager.getCurrentGui(player);
+        if (event.getInventory().equals(gui.getInventory())) {
+            OpenEvent openEvent = gui.getOpenEvent();
+            if (openEvent != null)
+                openEvent.run(event);
+        }
+    }
+
+    /**
+     * May not work correctly lol
+     */
+    @EventHandler
+    public void onClose(InventoryCloseEvent event) {
+        if (!(event.getPlayer() instanceof Player player)) return;
+        Gui gui = manager.getCurrentGui(player);
+        if (event.getInventory().equals(gui.getInventory())) {
+            CloseEvent closeEvent = gui.getCloseEvent();
+            if (closeEvent != null)
+                closeEvent.run(event);
         }
     }
 }

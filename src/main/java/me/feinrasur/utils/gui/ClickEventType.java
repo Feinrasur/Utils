@@ -9,4 +9,5 @@ public enum ClickEventType {
     KEYBOARD_CLICK,
     MIDDLE_CLICK,
     SHIFT_CLICK,
+    ALL;
 }

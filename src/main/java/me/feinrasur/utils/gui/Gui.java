@@ -3,7 +3,10 @@ package me.feinrasur.utils.gui;
 import me.feinrasur.utils.chat.Chat;
 import me.feinrasur.utils.gui.annotations.*;
 import me.feinrasur.utils.gui.interfaces.ClickEvent;
+import me.feinrasur.utils.gui.interfaces.CloseEvent;
+import me.feinrasur.utils.gui.interfaces.OpenEvent;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -14,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,11 +32,13 @@ public abstract class Gui {
     boolean swapOffHandClickable = false;
     boolean keyBoardClickable = false;
     boolean middleClickable = false;
+    boolean ignoreDeniedClick = false;
 
 
     Inventory guiInventory;
     Gui previousGUI = null;
     Gui nextGUI = null;
+    int rows;
 
     HashMap<Integer, ClickEvent> clickEvents = new HashMap<>();
     Map<Integer, ClickEvent> leftClickEvents = new HashMap<>();
@@ -42,16 +48,39 @@ public abstract class Gui {
     Map<Integer, ClickEvent> swapOffhandClickEvents = new HashMap<>();
     Map<Integer, ClickEvent> keyboardClickEvents = new HashMap<>();
     Map<Integer, ClickEvent> middleClickEvents = new HashMap<>();
+    CloseEvent closeEvent = null;
+    OpenEvent openEvent = null;
 
     /**
-     * @param size Size for the inventory of the GUI
+     * @param rows rows for the inventory of the GUI
      * @param name Name for the inventory of the GUI
      */
-    @SuppressWarnings("deprecation")
-    public Gui(@Nullable Integer size, @Nullable String name) {
+    public Gui(@Nullable Integer rows, @Nullable String name) {
 
-        if (size == null)
-            size = 27;
+        if (rows == null) {
+            rows = 1;
+        }
+        if (rows < 1) {
+            rows = 1;
+        }
+        if (rows > 6) {
+            rows = 6;
+        }
+
+        int size;
+
+        switch (rows) {
+            case 1 -> size = 9;
+            case 2 -> size = 18;
+            case 3 -> size = 27;
+            case 4 -> size = 36;
+            case 5 -> size = 45;
+            case 6 -> size = 54;
+            default -> size = 27;
+        }
+
+        this.rows = rows;
+
         if (name == null)
             name = "&#2cb2ff&lCustomGUI";
         for (Annotation annotation : this.getClass().getAnnotations()) {
@@ -81,8 +110,19 @@ public abstract class Gui {
                 this.leftShiftClickable = shiftClickable.value();
                 this.rightShiftClickable = shiftClickable.value();
             }
+            if (annotation instanceof AllClickable allClickable) {
+                this.leftClickable = true;
+                this.rightClickable = true;
+                this.leftShiftClickable = true;
+                this.rightShiftClickable = true;
+                this.swapOffHandClickable = true;
+                this.keyBoardClickable = true;
+                this.middleClickable = true;
+            }
+            if (annotation instanceof IgnoreDeniedClick) {
+                ignoreDeniedClick = true;
+            }
         }
-
         guiInventory = Bukkit.createInventory(null, size, Chat.format(name));
     }
 
@@ -115,6 +155,8 @@ public abstract class Gui {
     }
 
     /**
+     * Automatically creates LeftClickEvent
+     *
      * @param slot       Slot for the ClickEvent
      * @param clickEvent ClickEvent to be runned when clicked on the Slot
      */
@@ -232,6 +274,30 @@ public abstract class Gui {
     }
 
     /**
+     * Creates ClickEvents for all types. See ClickEventType
+     *
+     * @param slot       Slot for the ClickEvent
+     * @param clickEvent ClickEvent to be runned when clicked on the Slot
+     */
+    public void createAllClickEvent(Integer slot, ClickEvent clickEvent) {
+        leftClickEvents.put(slot, clickEvent);
+        rightClickEvents.put(slot, clickEvent);
+        leftShiftClickEvents.put(slot, clickEvent);
+        rightShiftClickEvents.put(slot, clickEvent);
+        swapOffhandClickEvents.put(slot, clickEvent);
+        keyboardClickEvents.put(slot, clickEvent);
+        middleClickEvents.put(slot, clickEvent);
+    }
+
+    public void createCloseEvent(CloseEvent closeEvent) {
+        this.closeEvent = closeEvent;
+    }
+
+    public void createOpenEvent(OpenEvent openEvent) {
+        this.openEvent = openEvent;
+    }
+
+    /**
      * @param slot Slot of the gui to get the ClickEvents from
      * @return ClickEvent in the slot
      */
@@ -316,6 +382,14 @@ public abstract class Gui {
         return List.of(leftShiftClickEvents.get(slot), rightShiftClickEvents.get(slot));
     }
 
+    public @Nullable CloseEvent getCloseEvent() {
+        return closeEvent;
+    }
+
+    public @Nullable OpenEvent getOpenEvent() {
+        return openEvent;
+    }
+
     /**
      * @param player Player to open the inventory for
      */
@@ -368,6 +442,15 @@ public abstract class Gui {
                 leftShiftClickEvents.put(slot, clickEvent);
                 rightShiftClickEvents.put(slot, clickEvent);
             }
+            case ALL -> {
+                leftClickEvents.put(slot, clickEvent);
+                rightClickEvents.put(slot, clickEvent);
+                leftShiftClickEvents.put(slot, clickEvent);
+                rightShiftClickEvents.put(slot, clickEvent);
+                swapOffhandClickEvents.put(slot, clickEvent);
+                keyboardClickEvents.put(slot, clickEvent);
+                middleClickEvents.put(slot, clickEvent);
+            }
         }
     }
 
@@ -382,6 +465,61 @@ public abstract class Gui {
             return freeSlot;
         }
         return null;
+    }
+
+    public void fillInventory() {
+        int x;
+        ItemStack item = new ItemStack(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
+        ItemMeta meta = item.getItemMeta();
+        meta.setDisplayName("§o");
+        item.setItemMeta(meta);
+        while (guiInventory.firstEmpty() != -1) {
+            x = guiInventory.firstEmpty();
+            setItem(x, item);
+        }
+    }
+
+    public void fillInventory(ItemStack item) {
+        int x;
+        ItemMeta meta = item.getItemMeta();
+        meta.setDisplayName("§o");
+        item.setItemMeta(meta);
+        while (guiInventory.firstEmpty() != -1) {
+            x = guiInventory.firstEmpty();
+            setItem(x, item);
+        }
+    }
+
+    public void setRow(Integer row, ItemStack item) {
+        if (row > 0 && row <= this.rows) {
+            getSlotsByRow(row).forEach(r -> setItem(r, item));
+        }
+    }
+
+    public void setRow(Integer row, ItemStack item, ClickEvent clickEvent, ClickEventType clickEventType) {
+        if (row > 0 && row <= this.rows) {
+            getSlotsByRow(row).forEach(r -> setItem(r, item, clickEvent, clickEventType));
+        }
+    }
+
+    public void fillRow(Integer row, ItemStack item) {
+        if (row > 0 && row <= this.rows) {
+            getSlotsByRow(row).forEach(r -> {
+                if (guiInventory.getItem(r) == null) {
+                    setItem(r, item);
+                }
+            });
+        }
+    }
+
+    public void fillRow(Integer row, ItemStack item, ClickEvent clickEvent, ClickEventType clickEventType) {
+        if (row > 0 && row <= this.rows) {
+            getSlotsByRow(row).forEach(r -> {
+                if (guiInventory.getItem(r) == null) {
+                    setItem(r, item, clickEvent, clickEventType);
+                }
+            });
+        }
     }
 
     /**
@@ -456,6 +594,10 @@ public abstract class Gui {
         return isLeftShiftClickable() && isRightShiftClickable();
     }
 
+    public boolean isIgnoreDeniedClick() {
+        return ignoreDeniedClick;
+    }
+
     /**
      * @param item Item to convert
      * @param name Sets the name for the item
@@ -468,5 +610,43 @@ public abstract class Gui {
         meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         item.setItemMeta(meta);
         return item;
+    }
+
+    private static List<Integer> getSlotsByRow(Integer row)
+    {
+        List<Integer> slots = new ArrayList<>();
+        switch (row) {
+            case 1 -> {
+                for (int i = 0; i < 9; i++) {
+                    slots.add(i);
+                }
+            }
+            case 2 -> {
+                for (int i = 9; i < 18; i++) {
+                    slots.add(i);
+                }
+            }
+            case 3 -> {
+                for (int i = 18; i < 27; i++) {
+                    slots.add(i);
+                }
+            }
+            case 4 -> {
+                for (int i = 27; i < 36; i++) {
+                    slots.add(i);
+                }
+            }
+            case 5 -> {
+                for (int i = 36; i < 45; i++) {
+                    slots.add(i);
+                }
+            }
+            case 6 -> {
+                for (int i = 45; i < 54; i++) {
+                    slots.add(i);
+                }
+            }
+        }
+        return slots;
     }
 }

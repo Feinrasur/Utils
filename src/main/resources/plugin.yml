@@ -1,8 +1,0 @@
-name: GuiManager
-version: '${project.version}'
-main: me.feinrasur.gui.App
-api-version: 1.18
-
-commands:
-  gui:
-    description: Nix

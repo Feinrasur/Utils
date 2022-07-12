@@ -1,8 +1,10 @@
 package me.feinrasur.utils.gui;
 
+import me.feinrasur.utils.gui.events.GuiClickEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
+@SuppressWarnings("all")
 public abstract class ClickEvent {
 
     Gui gui;
@@ -18,8 +20,8 @@ public abstract class ClickEvent {
 
         me.feinrasur.utils.gui.interfaces.ClickEvent clickEvent = new me.feinrasur.utils.gui.interfaces.ClickEvent() {
             @Override
-            public void run(InventoryClickEvent event) {
-                setClickEvent(event);
+            public void run(GuiClickEvent event) {
+
             }
         };
 

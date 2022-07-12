@@ -1,5 +1,6 @@
 package me.feinrasur.utils.gui;
 
+@SuppressWarnings("all")
 public enum ClickEventType {
     LEFT_CLICK,
     RIGHT_CLICK,

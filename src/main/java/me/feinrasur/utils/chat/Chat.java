@@ -1,5 +1,7 @@
 package me.feinrasur.utils.chat;
 
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -41,6 +43,12 @@ public class Chat {
 
         return matcher.appendTail(builder).toString();
     }
+
+
+    public static TextComponent formatComponent(String message) {
+        return LegacyComponentSerializer.builder().build().deserialize(Chat.format(message));
+    }
+
 
     public static void send(CommandSender sender, String message) {
         sender.sendMessage(format(prefix + message));

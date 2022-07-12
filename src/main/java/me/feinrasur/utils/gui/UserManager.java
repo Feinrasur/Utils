@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 import java.util.Map;
 
-@SuppressWarnings("unused")
+@SuppressWarnings("all")
 public class UserManager {
 
     private static final Map<Player, Gui> guiMap = new HashMap<>();

@@ -1,19 +1,26 @@
 package me.feinrasur.utils.gui;
 
 import me.feinrasur.utils.chat.Chat;
-import me.feinrasur.utils.gui.interfaces.ClickEvent;
+import me.feinrasur.utils.gui.events.GuiClickEvent;
+import me.feinrasur.utils.gui.events.GuiCloseEvent;
+import me.feinrasur.utils.gui.events.GuiOpenEvent;
 import me.feinrasur.utils.gui.interfaces.CloseEvent;
 import me.feinrasur.utils.gui.interfaces.OpenEvent;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.*;
+import org.bukkit.event.inventory.InventoryAction;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.plugin.java.JavaPlugin;
 
+@SuppressWarnings("all")
 public class GUIListener implements Listener {
 
     static UserManager manager;
@@ -74,149 +81,90 @@ public class GUIListener implements Listener {
         switch (event.getClick()) {
             case LEFT -> {
                 if (!gui.isLeftClickable()) {
-                    if (!gui.isIgnoreDeniedClick())
+                    if (!gui.isIgnoringDeniedClick())
                         Chat.send(player, "&cDieser Klick ist nicht erlaubt! Bitte benutze einen anderen Klick.");
-                    return;
                 }
-                ClickEvent clickEvent = gui.getLeftClickEvent(slot);
-                if (clickEvent != null) {
-                    clickEvent.run(event);
-                    return;
-                }
+                Bukkit.getPluginManager().callEvent(new GuiClickEvent(gui, player, slot, event.getCurrentItem(), gui.getLeftClickEvent(slot), ClickEventType.LEFT_CLICK));
             }
             case RIGHT -> {
                 if (!gui.isRightClickable()) {
-                    if (!gui.isIgnoreDeniedClick())
+                    if (!gui.isIgnoringDeniedClick())
                         Chat.send(player, "&cDieser Klick ist nicht erlaubt! Bitte benutze einen anderen Klick.");
-                    return;
                 }
-                ClickEvent clickEvent = gui.getRightClickEvent(slot);
-                if (clickEvent != null) {
-                    clickEvent.run(event);
-                    return;
-                }
+                Bukkit.getPluginManager().callEvent(new GuiClickEvent(gui, player, slot, event.getCurrentItem(), gui.getRightClickEvent(slot), ClickEventType.RIGHT_CLICK));
             }
             case SHIFT_LEFT -> {
                 if (gui.isLeftShiftClickable() || gui.isShiftClickable()) {
-                    ClickEvent clickEvent = gui.getLeftShiftClickEvent(slot);
-                    if (clickEvent != null) {
-                        clickEvent.run(event);
-                        return;
+                    if (!gui.isIgnoringDeniedClick()) {
+                        Chat.send(player, "&cDieser Klick ist nicht erlaubt! Bitte benutze einen anderen Klick.");
                     }
+                    Bukkit.getPluginManager().callEvent(new GuiClickEvent(gui, player, slot, event.getCurrentItem(), gui.getLeftShiftClickEvent(slot), ClickEventType.LEFT_SHIFT_CLICK));
                 }
-                if (!gui.isIgnoreDeniedClick())
-                    Chat.send(player, "&cDieser Klick ist nicht erlaubt! Bitte benutze einen anderen Klick.");
-                return;
             }
             case SHIFT_RIGHT -> {
                 if (gui.isRightShiftClickable() || gui.isShiftClickable()) {
-                    ClickEvent clickEvent = gui.getRightShiftClickEvent(slot);
-                    if (clickEvent != null) {
-                        clickEvent.run(event);
-                        return;
-                    }
-                    if (!gui.isIgnoreDeniedClick())
+                    if (!gui.isIgnoringDeniedClick())
                         Chat.send(player, "&cDieser Klick ist nicht erlaubt! Bitte benutze einen anderen Klick.");
-                    return;
                 }
+                Bukkit.getPluginManager().callEvent(new GuiClickEvent(gui, player, slot, event.getCurrentItem(), gui.getRightShiftClickEvent(slot), ClickEventType.RIGHT_SHIFT_CLICK));
             }
             case SWAP_OFFHAND -> {
                 if (event.isCancelled()) {
                     player.getInventory().setItemInOffHand(player.getInventory().getItemInOffHand());
                 }
                 if (!gui.isSwapOffHandClickable()) {
-                    if (!gui.isIgnoreDeniedClick())
+                    if (!gui.isIgnoringDeniedClick())
                         Chat.send(player, "&cDieser Klick ist nicht erlaubt! Bitte benutze einen anderen Klick.");
-                    return;
                 }
-                ClickEvent clickEvent = gui.getSwapOffhandClickEvent(slot);
-                if (clickEvent != null) {
-                    clickEvent.run(event);
-                    return;
-                }
+                Bukkit.getPluginManager().callEvent(new GuiClickEvent(gui, player, slot, event.getCurrentItem(), gui.getSwapOffhandClickEvent(slot), ClickEventType.SWAP_OFFHAND_CLICK));
             }
             case MIDDLE -> {
                 if (event.getWhoClicked().getGameMode().equals(GameMode.CREATIVE)) {
                     event.setCancelled(false);
-                    return;
                 }
                 if (!gui.isMiddleClickable()) {
-                    if (!gui.isIgnoreDeniedClick())
+                    if (!gui.isIgnoringDeniedClick())
                         Chat.send(player, "&cDieser Klick ist nicht erlaubt! Bitte benutze einen anderen Klick.");
-                    return;
                 }
-                ClickEvent clickEvent = gui.getMiddleClickEvent(slot);
-                if (clickEvent != null) {
-                    clickEvent.run(event);
-                    return;
-                }
+                Bukkit.getPluginManager().callEvent(new GuiClickEvent(gui, player, slot, event.getCurrentItem(), gui.getMiddleClickEvent(slot), ClickEventType.MIDDLE_CLICK));
             }
             case NUMBER_KEY -> {
                 if (!gui.isKeyBoardClickable()) {
-                    if (!gui.isIgnoreDeniedClick())
+                    if (!gui.isIgnoringDeniedClick())
                         Chat.send(player, "&cDieser Klick ist nicht erlaubt! Bitte benutze einen anderen Klick.");
-                    return;
                 }
-                ClickEvent clickEvent = gui.getKeyboardClickEvent(slot);
-                if (clickEvent != null) {
-                    clickEvent.run(event);
-                    return;
-                }
+                Bukkit.getPluginManager().callEvent(new GuiClickEvent(gui, player, slot, event.getCurrentItem(), gui.getKeyboardClickEvent(slot), ClickEventType.KEYBOARD_CLICK));
             }
         }
     }
 
-    /**
-    @EventHandler
-    public void onInvClose(InventoryCloseEvent event) {
-        if (!(event.getPlayer() instanceof Player player)) return;
-        Gui gui = manager.getCurrentGui(player);
-        if (gui == null) return;
-        Inventory guiInv = gui.getInventory();
-        if (guiInv.equals(event.getInventory())) manager.setCurrentGui(player, null);
-    }
-
 
     @EventHandler
-    public void onDisconnect(PlayerQuitEvent event) {
-        Player player = event.getPlayer();
-        Gui gui = manager.getCurrentGui(player);
-        if (gui != null) manager.setCurrentGui(player, null);
+    public void onOpen(GuiOpenEvent event) {
+        OpenEvent openEvent = event.getGui().getOpenEvent();
+        if (openEvent != null)
+            openEvent.run(event);
     }
 
-    @EventHandler
-    public void onDeath(PlayerDeathEvent event) {
-        Player player = event.getPlayer();
-        Gui gui = manager.getCurrentGui(player);
-        if (gui != null) manager.setCurrentGui(player, null);
-    }
-    */
-
-    /**
-     * May not work correctly lol
-     */
-    @EventHandler
-    public void onOpen(InventoryOpenEvent event) {
-        if (!(event.getPlayer() instanceof Player player)) return;
-        Gui gui = manager.getCurrentGui(player);
-        if (event.getInventory().equals(gui.getInventory())) {
-            OpenEvent openEvent = gui.getOpenEvent();
-            if (openEvent != null)
-                openEvent.run(event);
-        }
-    }
-
-    /**
-     * May not work correctly lol
-     */
     @EventHandler
     public void onClose(InventoryCloseEvent event) {
         if (!(event.getPlayer() instanceof Player player)) return;
         Gui gui = manager.getCurrentGui(player);
+        if (gui == null) return;
         if (event.getInventory().equals(gui.getInventory())) {
-            CloseEvent closeEvent = gui.getCloseEvent();
-            if (closeEvent != null)
-                closeEvent.run(event);
+            Bukkit.getServer().getPluginManager().callEvent(new GuiCloseEvent(gui, player));
         }
+    }
+
+    @EventHandler
+    public void onCloseGui(GuiCloseEvent event) {
+        CloseEvent closeEvent = event.getGui().getCloseEvent();
+        if (closeEvent != null)
+            closeEvent.run(event);
+    }
+
+    @EventHandler
+    public void onGuiClick(GuiClickEvent event) {
+        event.runClickEvent();
     }
 }

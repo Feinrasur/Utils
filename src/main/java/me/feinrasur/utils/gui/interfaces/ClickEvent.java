@@ -1,7 +1,8 @@
 package me.feinrasur.utils.gui.interfaces;
 
-import org.bukkit.event.inventory.InventoryClickEvent;
+import me.feinrasur.utils.gui.events.GuiClickEvent;
 
+@SuppressWarnings("all")
 public interface ClickEvent {
-    void run(InventoryClickEvent event);
+    void run(GuiClickEvent event);
 }

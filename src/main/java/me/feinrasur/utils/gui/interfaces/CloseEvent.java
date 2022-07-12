@@ -1,7 +1,8 @@
 package me.feinrasur.utils.gui.interfaces;
 
-import org.bukkit.event.inventory.InventoryCloseEvent;
+import me.feinrasur.utils.gui.events.GuiCloseEvent;
 
+@SuppressWarnings("all")
 public interface CloseEvent {
-    void run(InventoryCloseEvent event);
+    void run(GuiCloseEvent event);
 }

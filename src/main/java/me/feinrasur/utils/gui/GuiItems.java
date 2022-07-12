@@ -9,14 +9,14 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-@SuppressWarnings("unused")
+@SuppressWarnings("all")
 public class GuiItems {
 
     public static ItemStack convertToGui(@NotNull ItemStack item, @Nullable String name) {
         ItemMeta meta = item.getItemMeta();
         meta.addEnchant(Enchantment.MENDING, 1, true);
         if (name != null)
-            meta.setDisplayName(Chat.format(name));
+            meta.displayName(Chat.formatComponent(name));
         meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         item.setItemMeta(meta);
         return item;

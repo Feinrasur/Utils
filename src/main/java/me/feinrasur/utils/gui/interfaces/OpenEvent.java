@@ -1,7 +1,8 @@
 package me.feinrasur.utils.gui.interfaces;
 
-import org.bukkit.event.inventory.InventoryOpenEvent;
+import me.feinrasur.utils.gui.events.GuiOpenEvent;
 
+@SuppressWarnings("all")
 public interface OpenEvent {
-    void run(InventoryOpenEvent event);
+    void run(GuiOpenEvent event);
 }

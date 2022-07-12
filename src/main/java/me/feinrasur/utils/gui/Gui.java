@@ -2,9 +2,11 @@ package me.feinrasur.utils.gui;
 
 import me.feinrasur.utils.chat.Chat;
 import me.feinrasur.utils.gui.annotations.*;
+import me.feinrasur.utils.gui.events.GuiOpenEvent;
 import me.feinrasur.utils.gui.interfaces.ClickEvent;
 import me.feinrasur.utils.gui.interfaces.CloseEvent;
 import me.feinrasur.utils.gui.interfaces.OpenEvent;
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -22,7 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@SuppressWarnings("unused")
+@SuppressWarnings("all")
 public abstract class Gui {
 
     boolean leftClickable = true;
@@ -72,7 +74,6 @@ public abstract class Gui {
         switch (rows) {
             case 1 -> size = 9;
             case 2 -> size = 18;
-            case 3 -> size = 27;
             case 4 -> size = 36;
             case 5 -> size = 45;
             case 6 -> size = 54;
@@ -123,7 +124,8 @@ public abstract class Gui {
                 ignoreDeniedClick = true;
             }
         }
-        guiInventory = Bukkit.createInventory(null, size, Chat.format(name));
+        TextComponent cmp = Chat.formatComponent(name);
+        guiInventory = Bukkit.createInventory(null, size, cmp);
     }
 
     /**
@@ -181,7 +183,7 @@ public abstract class Gui {
     public void createBackClickEvent(Integer slot) {
         createClickEvent(slot, event -> {
             if (previousGUI != null) {
-                previousGUI.open((Player) event.getWhoClicked());
+                previousGUI.open(event.getPlayer());
             }
         });
     }
@@ -194,7 +196,7 @@ public abstract class Gui {
     public void createNextClickEvent(Integer slot) {
         createClickEvent(slot, event -> {
             if (nextGUI != null) {
-                nextGUI.open((Player) event.getWhoClicked());
+                nextGUI.open(event.getPlayer());
             }
         });
     }
@@ -205,7 +207,7 @@ public abstract class Gui {
      * @param slot Slot for the ClickEvent
      */
     public void createCloseClickEvent(Integer slot) {
-        createClickEvent(slot, event -> event.getWhoClicked().closeInventory());
+        createClickEvent(slot, event -> event.getPlayer().closeInventory());
     }
 
     /**
@@ -394,6 +396,7 @@ public abstract class Gui {
      * @param player Player to open the inventory for
      */
     public void open(Player player) {
+        GUIListener.plugin.getServer().getPluginManager().callEvent(new GuiOpenEvent(this, player));
         player.openInventory(getInventory());
         GUIListener.manager.setCurrentGui(player, this);
     }
@@ -471,7 +474,7 @@ public abstract class Gui {
         int x;
         ItemStack item = new ItemStack(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName("§o");
+        meta.displayName(Chat.formatComponent("&o"));
         item.setItemMeta(meta);
         while (guiInventory.firstEmpty() != -1) {
             x = guiInventory.firstEmpty();
@@ -482,7 +485,7 @@ public abstract class Gui {
     public void fillInventory(ItemStack item) {
         int x;
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName("§o");
+        meta.displayName(Chat.formatComponent("&o"));
         item.setItemMeta(meta);
         while (guiInventory.firstEmpty() != -1) {
             x = guiInventory.firstEmpty();
@@ -594,7 +597,7 @@ public abstract class Gui {
         return isLeftShiftClickable() && isRightShiftClickable();
     }
 
-    public boolean isIgnoreDeniedClick() {
+    public boolean isIgnoringDeniedClick() {
         return ignoreDeniedClick;
     }
 
@@ -606,14 +609,13 @@ public abstract class Gui {
     public static ItemStack convertGuiItem(ItemStack item, String name) {
         ItemMeta meta = item.getItemMeta();
         meta.addEnchant(Enchantment.MENDING, 1, true);
-        meta.setDisplayName(Chat.format(name));
+        meta.displayName(Chat.formatComponent(name));
         meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         item.setItemMeta(meta);
         return item;
     }
 
-    private static List<Integer> getSlotsByRow(Integer row)
-    {
+    private static List<Integer> getSlotsByRow(Integer row) {
         List<Integer> slots = new ArrayList<>();
         switch (row) {
             case 1 -> {

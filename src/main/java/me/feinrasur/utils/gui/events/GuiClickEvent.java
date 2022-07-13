@@ -87,7 +87,7 @@ public class GuiClickEvent extends Event implements Cancellable {
         return clickEvent;
     }
 
-    private void setClickEvent(ClickEvent clickEvent) {
+    public void setClickEvent(ClickEvent clickEvent) {
         this.clickEvent = clickEvent;
     }
 
@@ -100,7 +100,6 @@ public class GuiClickEvent extends Event implements Cancellable {
     }
 
     public void runClickEvent() {
-        if (isCancelled()) return;
         clickEvent.run(this);
     }
 }

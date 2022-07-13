@@ -83,6 +83,7 @@ public class GUIListener implements Listener {
                 if (!gui.isLeftClickable()) {
                     if (!gui.isIgnoringDeniedClick())
                         Chat.send(player, "&cDieser Klick ist nicht erlaubt! Bitte benutze einen anderen Klick.");
+                    return;
                 }
                 Bukkit.getPluginManager().callEvent(new GuiClickEvent(gui, player, slot, event.getCurrentItem(), gui.getLeftClickEvent(slot), ClickEventType.LEFT_CLICK));
             }
@@ -90,6 +91,7 @@ public class GUIListener implements Listener {
                 if (!gui.isRightClickable()) {
                     if (!gui.isIgnoringDeniedClick())
                         Chat.send(player, "&cDieser Klick ist nicht erlaubt! Bitte benutze einen anderen Klick.");
+                    return;
                 }
                 Bukkit.getPluginManager().callEvent(new GuiClickEvent(gui, player, slot, event.getCurrentItem(), gui.getRightClickEvent(slot), ClickEventType.RIGHT_CLICK));
             }
@@ -97,6 +99,7 @@ public class GUIListener implements Listener {
                 if (gui.isLeftShiftClickable() || gui.isShiftClickable()) {
                     if (!gui.isIgnoringDeniedClick()) {
                         Chat.send(player, "&cDieser Klick ist nicht erlaubt! Bitte benutze einen anderen Klick.");
+                        return;
                     }
                     Bukkit.getPluginManager().callEvent(new GuiClickEvent(gui, player, slot, event.getCurrentItem(), gui.getLeftShiftClickEvent(slot), ClickEventType.LEFT_SHIFT_CLICK));
                 }
@@ -105,6 +108,7 @@ public class GUIListener implements Listener {
                 if (gui.isRightShiftClickable() || gui.isShiftClickable()) {
                     if (!gui.isIgnoringDeniedClick())
                         Chat.send(player, "&cDieser Klick ist nicht erlaubt! Bitte benutze einen anderen Klick.");
+                    return;
                 }
                 Bukkit.getPluginManager().callEvent(new GuiClickEvent(gui, player, slot, event.getCurrentItem(), gui.getRightShiftClickEvent(slot), ClickEventType.RIGHT_SHIFT_CLICK));
             }
@@ -115,6 +119,7 @@ public class GUIListener implements Listener {
                 if (!gui.isSwapOffHandClickable()) {
                     if (!gui.isIgnoringDeniedClick())
                         Chat.send(player, "&cDieser Klick ist nicht erlaubt! Bitte benutze einen anderen Klick.");
+                    return;
                 }
                 Bukkit.getPluginManager().callEvent(new GuiClickEvent(gui, player, slot, event.getCurrentItem(), gui.getSwapOffhandClickEvent(slot), ClickEventType.SWAP_OFFHAND_CLICK));
             }
@@ -125,6 +130,7 @@ public class GUIListener implements Listener {
                 if (!gui.isMiddleClickable()) {
                     if (!gui.isIgnoringDeniedClick())
                         Chat.send(player, "&cDieser Klick ist nicht erlaubt! Bitte benutze einen anderen Klick.");
+                    return;
                 }
                 Bukkit.getPluginManager().callEvent(new GuiClickEvent(gui, player, slot, event.getCurrentItem(), gui.getMiddleClickEvent(slot), ClickEventType.MIDDLE_CLICK));
             }
@@ -132,6 +138,7 @@ public class GUIListener implements Listener {
                 if (!gui.isKeyBoardClickable()) {
                     if (!gui.isIgnoringDeniedClick())
                         Chat.send(player, "&cDieser Klick ist nicht erlaubt! Bitte benutze einen anderen Klick.");
+                    return;
                 }
                 Bukkit.getPluginManager().callEvent(new GuiClickEvent(gui, player, slot, event.getCurrentItem(), gui.getKeyboardClickEvent(slot), ClickEventType.KEYBOARD_CLICK));
             }
@@ -165,6 +172,7 @@ public class GUIListener implements Listener {
 
     @EventHandler
     public void onGuiClick(GuiClickEvent event) {
-        event.runClickEvent();
+        if (!event.isCancelled())
+            event.runClickEvent();
     }
 }

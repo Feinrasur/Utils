@@ -7,6 +7,7 @@ import me.feinrasur.utils.gui.interfaces.ClickEvent;
 import me.feinrasur.utils.gui.interfaces.CloseEvent;
 import me.feinrasur.utils.gui.interfaces.OpenEvent;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -609,7 +610,18 @@ public abstract class Gui {
     public static ItemStack convertGuiItem(ItemStack item, String name) {
         ItemMeta meta = item.getItemMeta();
         meta.addEnchant(Enchantment.MENDING, 1, true);
-        meta.displayName(Chat.formatComponent(name));
+        Map<TextDecoration, TextDecoration.State> decorations = new HashMap<>() {
+            {
+                put(TextDecoration.OBFUSCATED, TextDecoration.State.FALSE);
+                put(TextDecoration.BOLD, TextDecoration.State.FALSE);
+                put(TextDecoration.STRIKETHROUGH, TextDecoration.State.FALSE);
+                put(TextDecoration.UNDERLINED, TextDecoration.State.FALSE);
+                put(TextDecoration.ITALIC, TextDecoration.State.FALSE);
+            }
+        };
+        TextComponent component = Chat.formatComponent(name);
+        component.decorations(decorations);
+        meta.displayName(component);
         meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         item.setItemMeta(meta);
         return item;

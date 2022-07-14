@@ -6,7 +6,7 @@
 
     <groupId>me.feinrasur</groupId>
     <artifactId>Utils</artifactId>
-    <version>LATEST</version>
+    <version>1.1.9</version>
     <packaging>jar</packaging>
 
     <name>Utils</name>

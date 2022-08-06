@@ -12,7 +12,6 @@ import java.util.Map;
 
 public class Config {
 
-    private static FileConfiguration config;
     private static JavaPlugin plugin;
 
     public static Map<String, File> customConfigFiles = new HashMap<>();
@@ -24,13 +23,8 @@ public class Config {
         if (!folder.exists()) {
             folder.mkdirs();
         }
-        plugin.saveDefaultConfig();
-        config = plugin.getConfig();
     }
 
-    public static FileConfiguration getConfig() {
-        return config;
-    }
 
     public static FileConfiguration getConfig(String name) {
         if (customConfigs.containsKey(name)) {
@@ -38,10 +32,6 @@ public class Config {
         } else {
             return createCustomConfig(name);
         }
-    }
-
-    public static void save() {
-        plugin.saveConfig();
     }
 
     public static void save(String name) {
@@ -85,9 +75,5 @@ public class Config {
             config = createCustomConfig(name);
         config = YamlConfiguration.loadConfiguration(customConfigFiles.get(name));
         customConfigs.put(name, config);
-    }
-
-    public static void reload() {
-        plugin.reloadConfig();
     }
 }

@@ -16,7 +16,7 @@ public class Chat {
 
 
     public static void setPrefix(String prefix) {
-        Chat.prefix = prefix;
+        Chat.prefix = prefix + " &8» &r";
     }
 
 

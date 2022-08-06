@@ -6,7 +6,7 @@
 
     <groupId>me.feinrasur</groupId>
     <artifactId>Utils</artifactId>
-    <version>1.1.9</version>
+    <version>1.2.4</version>
     <packaging>jar</packaging>
 
     <name>Utils</name>
@@ -37,7 +37,13 @@
             <version>1.19-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>net.kyori</groupId>
+            <artifactId>adventure-platform-bukkit</artifactId>
+            <version>4.1.1</version>
+        </dependency>
     </dependencies>
+
 
     <distributionManagement>
         <repository>

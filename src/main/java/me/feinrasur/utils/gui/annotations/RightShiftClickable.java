@@ -4,11 +4,11 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-
 /**
- * Sets the rule that every click is allowed
+ * Sets the rule for right-shift-clicks
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface AllClickable {
+public @interface RightShiftClickable {
+    boolean value() default true;
 }

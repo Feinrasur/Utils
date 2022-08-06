@@ -78,6 +78,11 @@ public class GUIListener implements Listener {
         if (event.getClickedInventory().equals(guiInv))
             event.setCancelled(true);
 
+        if (gui.isEditable()) {
+            gui.setInventory(eventInv);
+            return;
+        }
+
         switch (event.getClick()) {
             case LEFT -> {
                 if (!gui.isLeftClickable()) {

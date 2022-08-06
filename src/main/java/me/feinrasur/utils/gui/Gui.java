@@ -36,6 +36,7 @@ public abstract class Gui {
     boolean keyBoardClickable = false;
     boolean middleClickable = false;
     boolean ignoreDeniedClick = false;
+    boolean editable = false;
 
 
     Inventory guiInventory;
@@ -93,11 +94,11 @@ public abstract class Gui {
             if (annotation instanceof RightClickable rightClickable) {
                 this.rightClickable = rightClickable.value();
             }
-            if (annotation instanceof ShiftLeftClickable shiftLeftClickable) {
+            if (annotation instanceof LeftShiftClickable shiftLeftClickable) {
                 this.leftShiftClickable = shiftLeftClickable.value();
             }
-            if (annotation instanceof ShiftRightClickable shiftRightClickable) {
-                this.rightShiftClickable = shiftRightClickable.value();
+            if (annotation instanceof LeftShiftClickable rightShiftClickable) {
+                this.rightShiftClickable = rightShiftClickable.value();
             }
             if (annotation instanceof SwapOffhandClickable swapOffhandClickable) {
                 this.swapOffHandClickable = swapOffhandClickable.value();
@@ -123,6 +124,10 @@ public abstract class Gui {
             }
             if (annotation instanceof IgnoreDeniedClick) {
                 ignoreDeniedClick = true;
+            }
+
+            if (annotation instanceof Editable) {
+                editable = true;
             }
         }
         TextComponent cmp = Chat.formatComponent(name);
@@ -542,6 +547,10 @@ public abstract class Gui {
         return null;
     }
 
+    public void setInventory(Inventory inventory) {
+        this.guiInventory = inventory;
+    }
+
     /**
      * @return If Leftclicks are allowed
      */
@@ -600,6 +609,46 @@ public abstract class Gui {
 
     public boolean isIgnoringDeniedClick() {
         return ignoreDeniedClick;
+    }
+
+    public boolean isEditable() {
+        return  editable;
+    }
+
+    public void setLeftClickable(boolean leftClickable) {
+        this.leftClickable = leftClickable;
+    }
+
+    public void setRightClickable(boolean rightClickable) {
+        this.rightClickable = rightClickable;
+    }
+
+    public void setLeftShiftClickable(boolean leftShiftClickable) {
+        this.leftShiftClickable = leftShiftClickable;
+    }
+
+    public void setRightShiftClickable(boolean rightShiftClickable) {
+        this.rightShiftClickable = rightShiftClickable;
+    }
+
+    public void setSwapOffHandClickable(boolean swapOffHandClickable) {
+        this.swapOffHandClickable = swapOffHandClickable;
+    }
+
+    public void setKeyBoardClickable(boolean keyBoardClickable) {
+        this.keyBoardClickable = keyBoardClickable;
+    }
+
+    public void setMiddleClickable(boolean middleClickable) {
+        this.middleClickable = middleClickable;
+    }
+
+    public void setIgnoreDeniedClick(boolean ignoreDeniedClick) {
+        this.ignoreDeniedClick = ignoreDeniedClick;
+    }
+
+    public void setEditable(boolean editable) {
+        this.editable = editable;
     }
 
     /**

@@ -40,6 +40,10 @@ public class Kyori {
         return new Kyori(MiniMessage.miniMessage().deserialize(message));
     }
 
+    public static Kyori createNoFormat(String message) {
+        return new Kyori(MiniMessage.miniMessage().deserialize(message));
+    }
+
     private boolean isInitialized() {
         return adventure != null;
     }
@@ -57,9 +61,9 @@ public class Kyori {
     }
 
     public void disable() {
-        if (this.adventure != null) {
-            this.adventure.close();
-            this.adventure = null;
+        if (adventure != null) {
+            adventure.close();
+            adventure = null;
         }
     }
 
@@ -71,5 +75,13 @@ public class Kyori {
     public void send(Player player) {
         Component cmp = prefix.append(component);
         adventure.player(player).sendMessage(cmp);
+    }
+
+    public static void send(CommandSender sender, Component component) {
+        adventure.sender(sender).sendMessage(component);
+    }
+
+    public static void send(Player sender, Component component) {
+        adventure.player(sender).sendMessage(component);
     }
 }

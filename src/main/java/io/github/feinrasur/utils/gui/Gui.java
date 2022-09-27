@@ -1,11 +1,11 @@
 package io.github.feinrasur.utils.gui;
 
-import io.github.feinrasur.utils.gui.events.GuiOpenEvent;
-import io.github.feinrasur.utils.gui.interfaces.ClickEvent;
 import io.github.feinrasur.utils.chat.Chat;
+import io.github.feinrasur.utils.gui.annotation.*;
+import io.github.feinrasur.utils.gui.event.GuiOpenEvent;
+import io.github.feinrasur.utils.gui.interfaces.ClickEvent;
 import io.github.feinrasur.utils.gui.interfaces.CloseEvent;
 import io.github.feinrasur.utils.gui.interfaces.OpenEvent;
-import io.github.feinrasur.utils.gui.annotations.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@SuppressWarnings("all")
 public abstract class Gui {
 
     boolean leftClickable = true;
@@ -44,15 +43,16 @@ public abstract class Gui {
     private Gui previousGUI = null;
     private Gui nextGUI = null;
     private int rows;
+    private int size;
+    private String permission = null;
 
-    private HashMap<Integer, io.github.feinrasur.utils.gui.interfaces.ClickEvent> clickEvents = new HashMap<>();
-    private Map<Integer, io.github.feinrasur.utils.gui.interfaces.ClickEvent> leftClickEvents = new HashMap<>();
-    private Map<Integer, io.github.feinrasur.utils.gui.interfaces.ClickEvent> rightClickEvents = new HashMap<>();
-    private Map<Integer, io.github.feinrasur.utils.gui.interfaces.ClickEvent> leftShiftClickEvents = new HashMap<>();
-    private Map<Integer, io.github.feinrasur.utils.gui.interfaces.ClickEvent> rightShiftClickEvents = new HashMap<>();
-    private Map<Integer, io.github.feinrasur.utils.gui.interfaces.ClickEvent> swapOffhandClickEvents = new HashMap<>();
-    private Map<Integer, io.github.feinrasur.utils.gui.interfaces.ClickEvent> keyboardClickEvents = new HashMap<>();
-    private Map<Integer, io.github.feinrasur.utils.gui.interfaces.ClickEvent> middleClickEvents = new HashMap<>();
+    private final Map<Integer, ClickEvent> leftClickEvents = new HashMap<>();
+    private final Map<Integer, ClickEvent> rightClickEvents = new HashMap<>();
+    private final Map<Integer, ClickEvent> leftShiftClickEvents = new HashMap<>();
+    private final Map<Integer, ClickEvent> rightShiftClickEvents = new HashMap<>();
+    private final Map<Integer, ClickEvent> swapOffhandClickEvents = new HashMap<>();
+    private final Map<Integer, ClickEvent> keyboardClickEvents = new HashMap<>();
+    private final Map<Integer, ClickEvent> middleClickEvents = new HashMap<>();
     private CloseEvent closeEvent = null;
     private OpenEvent openEvent = null;
 
@@ -60,77 +60,11 @@ public abstract class Gui {
      * @param rows rows for the inventory of the GUI
      * @param name Name for the inventory of the GUI
      */
+    @Deprecated
     public Gui(@Nullable Integer rows, @Nullable String name) {
-
-        if (rows == null) {
-            rows = 1;
-        }
-        if (rows < 1) {
-            rows = 1;
-        }
-        if (rows > 6) {
-            rows = 6;
-        }
-
-        int size;
-
-        switch (rows) {
-            case 1 -> size = 9;
-            case 2 -> size = 18;
-            case 4 -> size = 36;
-            case 5 -> size = 45;
-            case 6 -> size = 54;
-            default -> size = 27;
-        }
-
-        this.rows = rows;
-
         if (name == null)
             name = "&#2cb2ff&lCustomGUI";
-        for (Annotation annotation : this.getClass().getAnnotations()) {
-
-            if (annotation instanceof LeftClickable leftClickable) {
-                this.leftClickable = leftClickable.value();
-            }
-            if (annotation instanceof RightClickable rightClickable) {
-                this.rightClickable = rightClickable.value();
-            }
-            if (annotation instanceof LeftShiftClickable shiftLeftClickable) {
-                this.leftShiftClickable = shiftLeftClickable.value();
-            }
-            if (annotation instanceof LeftShiftClickable rightShiftClickable) {
-                this.rightShiftClickable = rightShiftClickable.value();
-            }
-            if (annotation instanceof SwapOffhandClickable swapOffhandClickable) {
-                this.swapOffHandClickable = swapOffhandClickable.value();
-            }
-            if (annotation instanceof KeyboardClickable keyboardClickable) {
-                this.keyBoardClickable = keyboardClickable.value();
-            }
-            if (annotation instanceof MiddleClickable middleClickable) {
-                this.middleClickable = middleClickable.value();
-            }
-            if (annotation instanceof ShiftClickable shiftClickable) {
-                this.leftShiftClickable = shiftClickable.value();
-                this.rightShiftClickable = shiftClickable.value();
-            }
-            if (annotation instanceof AllClickable allClickable) {
-                this.leftClickable = true;
-                this.rightClickable = true;
-                this.leftShiftClickable = true;
-                this.rightShiftClickable = true;
-                this.swapOffHandClickable = true;
-                this.keyBoardClickable = true;
-                this.middleClickable = true;
-            }
-            if (annotation instanceof IgnoreDeniedClick) {
-                ignoreDeniedClick = true;
-            }
-
-            if (annotation instanceof Editable) {
-                editable = true;
-            }
-        }
+        init(rows);
         TextComponent cmp = Chat.formatComponent(name);
         guiInventory = Bukkit.createInventory(null, size, cmp);
     }
@@ -140,7 +74,13 @@ public abstract class Gui {
      * @param name Name for the inventory of the GUI
      */
     public Gui(@Nullable Integer rows, @Nullable Component name) {
+        if (name == null)
+            name = Chat.formatComponent("&#2cb2ff&lCustomGUI");
+        init(rows);
+        guiInventory = Bukkit.createInventory(null, size, name);
+    }
 
+    private void init(Integer rows) {
         if (rows == null) {
             rows = 1;
         }
@@ -150,8 +90,6 @@ public abstract class Gui {
         if (rows > 6) {
             rows = 6;
         }
-
-        int size;
 
         switch (rows) {
             case 1 -> size = 9;
@@ -164,8 +102,6 @@ public abstract class Gui {
 
         this.rows = rows;
 
-        if (name == null)
-            name = Chat.formatComponent("&#2cb2ff&lCustomGUI");
         for (Annotation annotation : this.getClass().getAnnotations()) {
 
             if (annotation instanceof LeftClickable leftClickable) {
@@ -202,15 +138,17 @@ public abstract class Gui {
                 this.keyBoardClickable = true;
                 this.middleClickable = true;
             }
-            if (annotation instanceof IgnoreDeniedClick) {
+            if (annotation instanceof InfoDeniedClick) {
                 ignoreDeniedClick = true;
             }
 
             if (annotation instanceof Editable) {
                 editable = true;
             }
+            if (annotation instanceof Permission permission) {
+                this.permission = permission.value();
+            }
         }
-        guiInventory = Bukkit.createInventory(null, size, name);
     }
 
     /**
@@ -247,17 +185,17 @@ public abstract class Gui {
      * @param slot       Slot for the ClickEvent
      * @param clickEvent ClickEvent to be runned when clicked on the Slot
      */
-    public void createClickEvent(Integer slot, io.github.feinrasur.utils.gui.interfaces.ClickEvent clickEvent) {
+    public void createClickEvent(Integer slot, ClickEvent clickEvent) {
         leftClickEvents.put(slot, clickEvent);
     }
 
     /**
      * @param slot       Slot for the ClickEvent
      * @param clickEvent ClickEvent to be runned when clicked on the Slot
-     * @param type       Set the ClickEventType for the ClickEvent
+     * @param type       Set the type for the ClickEvent
      */
-    public void createClickEvent(Integer slot, io.github.feinrasur.utils.gui.interfaces.ClickEvent clickEvent, ClickEventType type) {
-        setClickEventByType(slot, clickEvent, type);
+    public void createClickEvent(Integer slot, ClickType type, ClickEvent clickEvent) {
+        setClickEventByType(slot, type, clickEvent);
     }
 
     /**
@@ -299,7 +237,7 @@ public abstract class Gui {
      * @param slot       Slot for the ClickEvent
      * @param clickEvent ClickEvent to be runned when clicked on the Slot
      */
-    public void createLeftClickEvent(Integer slot, io.github.feinrasur.utils.gui.interfaces.ClickEvent clickEvent) {
+    public void createLeftClickEvent(Integer slot, ClickEvent clickEvent) {
         leftClickEvents.put(slot, clickEvent);
     }
 
@@ -307,7 +245,7 @@ public abstract class Gui {
      * @param slot       Slot for the ClickEvent
      * @param clickEvent ClickEvent to be runned when clicked on the Slot
      */
-    public void createRightClickEvent(Integer slot, io.github.feinrasur.utils.gui.interfaces.ClickEvent clickEvent) {
+    public void createRightClickEvent(Integer slot, ClickEvent clickEvent) {
         rightClickEvents.put(slot, clickEvent);
     }
 
@@ -315,7 +253,7 @@ public abstract class Gui {
      * @param slot       Slot for the ClickEvent
      * @param clickEvent ClickEvent to be runned when clicked on the Slot
      */
-    public void createLeftShiftClickEvent(Integer slot, io.github.feinrasur.utils.gui.interfaces.ClickEvent clickEvent) {
+    public void createLeftShiftClickEvent(Integer slot, ClickEvent clickEvent) {
         leftShiftClickEvents.put(slot, clickEvent);
     }
 
@@ -323,7 +261,7 @@ public abstract class Gui {
      * @param slot       Slot for the ClickEvent
      * @param clickEvent ClickEvent to be runned when clicked on the Slot
      */
-    public void createRightShiftClickEvent(Integer slot, io.github.feinrasur.utils.gui.interfaces.ClickEvent clickEvent) {
+    public void createRightShiftClickEvent(Integer slot, ClickEvent clickEvent) {
         rightShiftClickEvents.put(slot, clickEvent);
     }
 
@@ -331,7 +269,7 @@ public abstract class Gui {
      * @param slot       Slot for the ClickEvent
      * @param clickEvent ClickEvent to be runned when clicked on the Slot
      */
-    public void createSwapOffhandClickEvent(Integer slot, io.github.feinrasur.utils.gui.interfaces.ClickEvent clickEvent) {
+    public void createSwapOffhandClickEvent(Integer slot, ClickEvent clickEvent) {
         swapOffhandClickEvents.put(slot, clickEvent);
     }
 
@@ -339,7 +277,7 @@ public abstract class Gui {
      * @param slot       Slot for the ClickEvent
      * @param clickEvent ClickEvent to be runned when clicked on the Slot
      */
-    public void createKeyboardClickEvent(Integer slot, io.github.feinrasur.utils.gui.interfaces.ClickEvent clickEvent) {
+    public void createKeyboardClickEvent(Integer slot, ClickEvent clickEvent) {
         keyboardClickEvents.put(slot, clickEvent);
     }
 
@@ -347,7 +285,7 @@ public abstract class Gui {
      * @param slot       Slot for the ClickEvent
      * @param clickEvent ClickEvent to be runned when clicked on the Slot
      */
-    public void createMiddleClickEvent(Integer slot, io.github.feinrasur.utils.gui.interfaces.ClickEvent clickEvent) {
+    public void createMiddleClickEvent(Integer slot, ClickEvent clickEvent) {
         middleClickEvents.put(slot, clickEvent);
     }
 
@@ -355,18 +293,18 @@ public abstract class Gui {
      * @param slot       Slot for the ClickEvent
      * @param clickEvent ClickEvent to be runned when clicked on the Slot
      */
-    public void createShiftClickEvent(Integer slot, io.github.feinrasur.utils.gui.interfaces.ClickEvent clickEvent) {
+    public void createShiftClickEvent(Integer slot, ClickEvent clickEvent) {
         leftShiftClickEvents.put(slot, clickEvent);
         rightShiftClickEvents.put(slot, clickEvent);
     }
 
     /**
-     * Creates ClickEvents for all types. See ClickEventType
+     * Creates ClickEvents for all types. See type
      *
      * @param slot       Slot for the ClickEvent
      * @param clickEvent ClickEvent to be runned when clicked on the Slot
      */
-    public void createAllClickEvent(Integer slot, io.github.feinrasur.utils.gui.interfaces.ClickEvent clickEvent) {
+    public void createAllClickEvent(Integer slot, ClickEvent clickEvent) {
         leftClickEvents.put(slot, clickEvent);
         rightClickEvents.put(slot, clickEvent);
         leftShiftClickEvents.put(slot, clickEvent);
@@ -388,7 +326,7 @@ public abstract class Gui {
      * @param slot Slot of the gui to get the ClickEvents from
      * @return ClickEvent in the slot
      */
-    public @Nullable io.github.feinrasur.utils.gui.interfaces.ClickEvent getLeftClickEvent(Integer slot) {
+    public @Nullable ClickEvent getLeftClickEvent(Integer slot) {
         if (leftClickEvents.containsKey(slot)) {
             return leftClickEvents.get(slot);
         }
@@ -399,7 +337,7 @@ public abstract class Gui {
      * @param slot Slot of the gui to get the ClickEvents from
      * @return ClickEvent in the slot
      */
-    public @Nullable io.github.feinrasur.utils.gui.interfaces.ClickEvent getRightClickEvent(Integer slot) {
+    public @Nullable ClickEvent getRightClickEvent(Integer slot) {
         if (rightClickEvents.containsKey(slot)) {
             return rightClickEvents.get(slot);
         }
@@ -410,7 +348,7 @@ public abstract class Gui {
      * @param slot Slot of the gui to get the ClickEvents from
      * @return ClickEvent in the slot
      */
-    public @Nullable io.github.feinrasur.utils.gui.interfaces.ClickEvent getLeftShiftClickEvent(Integer slot) {
+    public @Nullable ClickEvent getLeftShiftClickEvent(Integer slot) {
         if (leftShiftClickEvents.containsKey(slot)) {
             return leftShiftClickEvents.get(slot);
         }
@@ -421,7 +359,7 @@ public abstract class Gui {
      * @param slot Slot of the gui to get the ClickEvents from
      * @return ClickEvent in the slot
      */
-    public @Nullable io.github.feinrasur.utils.gui.interfaces.ClickEvent getRightShiftClickEvent(Integer slot) {
+    public @Nullable ClickEvent getRightShiftClickEvent(Integer slot) {
         if (rightShiftClickEvents.containsKey(slot)) {
             return rightShiftClickEvents.get(slot);
         }
@@ -432,7 +370,7 @@ public abstract class Gui {
      * @param slot Slot of the gui to get the ClickEvents from
      * @return ClickEvent in the slot
      */
-    public @Nullable io.github.feinrasur.utils.gui.interfaces.ClickEvent getSwapOffhandClickEvent(Integer slot) {
+    public @Nullable ClickEvent getSwapOffhandClickEvent(Integer slot) {
         if (swapOffhandClickEvents.containsKey(slot)) {
             return swapOffhandClickEvents.get(slot);
         }
@@ -443,7 +381,7 @@ public abstract class Gui {
      * @param slot Slot of the gui to get the ClickEvents from
      * @return ClickEvent in the slot
      */
-    public @Nullable io.github.feinrasur.utils.gui.interfaces.ClickEvent getKeyboardClickEvent(Integer slot) {
+    public @Nullable ClickEvent getKeyboardClickEvent(Integer slot) {
         if (keyboardClickEvents.containsKey(slot)) {
             return keyboardClickEvents.get(slot);
         }
@@ -454,7 +392,7 @@ public abstract class Gui {
      * @param slot Slot of the gui to get the ClickEvents from
      * @return ClickEvent in the slot
      */
-    public @Nullable io.github.feinrasur.utils.gui.interfaces.ClickEvent getMiddleClickEvent(Integer slot) {
+    public @Nullable ClickEvent getMiddleClickEvent(Integer slot) {
         if (middleClickEvents.containsKey(slot)) {
             return middleClickEvents.get(slot);
         }
@@ -465,7 +403,7 @@ public abstract class Gui {
      * @param slot Slot of the gui to get the ClickEvents from
      * @return List of the ClickEvents in the slots
      */
-    public @Nullable List<io.github.feinrasur.utils.gui.interfaces.ClickEvent> getShiftClickEvents(Integer slot) {
+    public @Nullable List<ClickEvent> getShiftClickEvents(Integer slot) {
         return List.of(leftShiftClickEvents.get(slot), rightShiftClickEvents.get(slot));
     }
 
@@ -481,9 +419,20 @@ public abstract class Gui {
      * @param player Player to open the inventory for
      */
     public void open(Player player) {
-        GUIListener.plugin.getServer().getPluginManager().callEvent(new GuiOpenEvent(this, player));
-        player.openInventory(getInventory());
-        GUIListener.manager.setCurrentGui(player, this);
+        String permission = getPermission();
+        if (permission == null) {
+            GUIListener.plugin.getServer().getPluginManager().callEvent(new GuiOpenEvent(this, player));
+            player.openInventory(getInventory());
+            GUIListener.manager.setCurrentGui(player, this);
+            return;
+        }
+        if (player.hasPermission(permission) || permission == null) {
+            GUIListener.plugin.getServer().getPluginManager().callEvent(new GuiOpenEvent(this, player));
+            player.openInventory(getInventory());
+            GUIListener.manager.setCurrentGui(player, this);
+        } else {
+            Chat.send(player, "No permission to open this gui.");
+        }
     }
 
     /**
@@ -502,23 +451,23 @@ public abstract class Gui {
     }
 
     /**
-     * @param slot           Set the slot for the Item
-     * @param item           item to put in the slot
-     * @param clickEvent     Set the ClickEvent
-     * @param clickEventType Set the ClickEventType for the ClickEvent
+     * @param slot       Set the slot for the Item
+     * @param item       item to put in the slot
+     * @param clickEvent Set the ClickEvent
+     * @param type       Set the type for the ClickEvent
      */
-    public void setItem(@NotNull Integer slot, @NotNull ItemStack item, @NotNull io.github.feinrasur.utils.gui.interfaces.ClickEvent clickEvent, @NotNull ClickEventType clickEventType) {
+    public void setItem(@NotNull Integer slot, @NotNull ItemStack item, @NotNull ClickType type, @NotNull ClickEvent clickEvent) {
         guiInventory.setItem(slot, item);
-        setClickEventByType(slot, clickEvent, clickEventType);
+        setClickEventByType(slot, type, clickEvent);
     }
 
     /**
-     * @param slot           Set the slot for the ClickEvent
-     * @param clickEvent     set the ClickEvent
-     * @param clickEventType Set the ClickEventType for the ClickEvent
+     * @param slot       Set the slot for the ClickEvent
+     * @param clickEvent set the ClickEvent
+     * @param type       Set the type for the ClickEvent
      */
-    private void setClickEventByType(Integer slot, io.github.feinrasur.utils.gui.interfaces.ClickEvent clickEvent, ClickEventType clickEventType) {
-        switch (clickEventType) {
+    private void setClickEventByType(Integer slot, ClickType type, ClickEvent clickEvent) {
+        switch (type) {
             case LEFT_CLICK -> leftClickEvents.put(slot, clickEvent);
             case RIGHT_CLICK -> rightClickEvents.put(slot, clickEvent);
             case LEFT_SHIFT_CLICK -> leftShiftClickEvents.put(slot, clickEvent);
@@ -586,7 +535,8 @@ public abstract class Gui {
 
     /**
      * Sets a row full with an item
-     * @param row Row to set
+     *
+     * @param row  Row to set
      * @param item Item for row
      */
     public void setRow(Integer row, ItemStack item) {
@@ -597,20 +547,22 @@ public abstract class Gui {
 
     /**
      * Sets a row full with an item
-     * @param row Row to set
-     * @param item Item for row
+     *
+     * @param row        Row to set
+     * @param item       Item for row
      * @param clickEvent clickEvent for every item in the row
-     * @param clickEventType ClickType for the ClickEvent
+     * @param type       ClickType for the ClickEvent
      */
-    public void setRow(Integer row, ItemStack item, io.github.feinrasur.utils.gui.interfaces.ClickEvent clickEvent, ClickEventType clickEventType) {
+    public void setRow(Integer row, ItemStack item, ClickType type, ClickEvent clickEvent) {
         if (row > 0 && row <= this.rows) {
-            getSlotsByRow(row).forEach(r -> setItem(r, item, clickEvent, clickEventType));
+            getSlotsByRow(row).forEach(r -> setItem(r, item, type, clickEvent));
         }
     }
 
     /**
      * Fills a row full with an item
-     * @param row Row to fill
+     *
+     * @param row  Row to fill
      * @param item Item for row
      */
     public void fillRow(Integer row, ItemStack item) {
@@ -625,32 +577,33 @@ public abstract class Gui {
 
     /**
      * Fills a row full with an item
-     * @param row Row to fill
-     * @param item Item for row
+     *
+     * @param row        Row to fill
+     * @param item       Item for row
      * @param clickEvent clickEvent for every item in the row
-     * @param clickEventType ClickType for the ClickEvent
+     * @param type       ClickType for the ClickEvent
      */
-    public void fillRow(Integer row, ItemStack item, io.github.feinrasur.utils.gui.interfaces.ClickEvent clickEvent, ClickEventType clickEventType) {
+    public void fillRow(Integer row, ItemStack item, ClickType type, ClickEvent clickEvent) {
         if (row > 0 && row <= this.rows) {
             getSlotsByRow(row).forEach(r -> {
                 if (guiInventory.getItem(r) == null) {
-                    setItem(r, item, clickEvent, clickEventType);
+                    setItem(r, item, type, clickEvent);
                 }
             });
         }
     }
 
     /**
-     * @param item           item to add
-     * @param clickEvent     set the ClickEvent for the item
-     * @param clickEventType set the ClickEvent type for the ClickEvent
+     * @param item       item to add
+     * @param clickEvent set the ClickEvent for the item
+     * @param type       set the ClickEvent type for the ClickEvent
      * @return Slot where item got put in
      */
-    public @Nullable Integer addItem(ItemStack item, ClickEvent clickEvent, ClickEventType clickEventType) {
+    public @Nullable Integer addItem(ItemStack item, ClickType type, ClickEvent clickEvent) {
         int freeSlot = guiInventory.firstEmpty();
         if (freeSlot >= 0) {
             guiInventory.setItem(freeSlot, item);
-            setClickEventByType(freeSlot, clickEvent, clickEventType);
+            setClickEventByType(freeSlot, type, clickEvent);
             return freeSlot;
         }
         return null;
@@ -722,7 +675,7 @@ public abstract class Gui {
     /**
      * @return If denied clicks are ignored
      */
-    public boolean isIgnoringDeniedClick() {
+    public boolean isInfoDeniedClick() {
         return ignoreDeniedClick;
     }
 
@@ -730,7 +683,14 @@ public abstract class Gui {
      * @return If gui is editable
      */
     public boolean isEditable() {
-        return  editable;
+        return editable;
+    }
+
+    /**
+     * @return Permission to open the gui
+     */
+    public String getPermission() {
+        return this.permission;
     }
 
     /**
@@ -801,6 +761,7 @@ public abstract class Gui {
      * @param name Sets the name for the item
      * @return Custom modified item
      */
+    @Deprecated
     public static ItemStack convertGuiItem(ItemStack item, String name) {
         ItemMeta meta = item.getItemMeta();
         meta.addEnchant(Enchantment.MENDING, 1, true);
@@ -816,6 +777,15 @@ public abstract class Gui {
         TextComponent component = Chat.formatComponent(name);
         component.decorations(decorations);
         meta.displayName(component);
+        meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        item.setItemMeta(meta);
+        return item;
+    }
+
+    public static ItemStack convertGuiItem(ItemStack item, Component name) {
+        ItemMeta meta = item.getItemMeta();
+        meta.addEnchant(Enchantment.MENDING, 1, true);
+        meta.displayName(name);
         meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         item.setItemMeta(meta);
         return item;

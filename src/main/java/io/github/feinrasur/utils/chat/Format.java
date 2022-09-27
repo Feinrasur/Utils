@@ -31,7 +31,7 @@ public class Format {
     }
 
     public static String cc(String message) {
-        String string = message.replace("§", "&");
+        String string = message.replace("&", "§");
         for (Map.Entry<String, String> code : codes.entrySet()) {
             string = string.replace(code.getKey(), code.getValue());
         }

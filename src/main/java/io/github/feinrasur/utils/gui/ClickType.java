@@ -1,7 +1,7 @@
 package io.github.feinrasur.utils.gui;
 
 @SuppressWarnings("all")
-public enum ClickEventType {
+public enum ClickType {
     LEFT_CLICK,
     RIGHT_CLICK,
     LEFT_SHIFT_CLICK,

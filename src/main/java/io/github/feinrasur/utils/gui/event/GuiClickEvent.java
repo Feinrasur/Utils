@@ -1,6 +1,6 @@
-package io.github.feinrasur.utils.gui.events;
+package io.github.feinrasur.utils.gui.event;
 
-import io.github.feinrasur.utils.gui.ClickEventType;
+import io.github.feinrasur.utils.gui.ClickType;
 import io.github.feinrasur.utils.gui.Gui;
 import io.github.feinrasur.utils.gui.interfaces.ClickEvent;
 import org.bukkit.entity.Player;
@@ -10,25 +10,24 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-@SuppressWarnings("all")
 public class GuiClickEvent extends Event implements Cancellable {
 
     private boolean cancelled = false;
     private static final HandlerList handlers = new HandlerList();
-    private Gui gui;
-    private Player player;
-    private Integer clickedSlot;
-    private ItemStack clickedItem;
-    private ClickEvent clickEvent;
-    private ClickEventType clickEventType;
+    private Gui gui = null;
+    private Player player = null;
+    private Integer clickedSlot = null;
+    private ItemStack clickedItem = null;
+    private ClickEvent clickEvent = null;
+    private ClickType type = null;
 
-    public GuiClickEvent(Gui gui, Player player, Integer slot, ItemStack clickedItem, ClickEvent clickEvent, ClickEventType clickEventType) {
+    public GuiClickEvent(Gui gui, Player player, Integer slot, ItemStack clickedItem, ClickEvent clickEvent, ClickType type) {
         setGui(gui);
         setPlayer(player);
         setClickedSlot(slot);
         setClickedItem(clickedItem);
         setClickEvent(clickEvent);
-        setClickEventType(clickEventType);
+        settype(type);
     }
 
     @Override
@@ -91,12 +90,12 @@ public class GuiClickEvent extends Event implements Cancellable {
         this.clickEvent = clickEvent;
     }
 
-    public ClickEventType getClickEventType() {
-        return clickEventType;
+    public ClickType gettype() {
+        return type;
     }
 
-    private void setClickEventType(ClickEventType clickEventType) {
-        this.clickEventType = clickEventType;
+    private void settype(ClickType type) {
+        this.type = type;
     }
 
     public void runClickEvent() {

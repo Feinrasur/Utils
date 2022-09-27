@@ -1,4 +1,4 @@
-package io.github.feinrasur.utils.gui.events;
+package io.github.feinrasur.utils.gui.event;
 
 import io.github.feinrasur.utils.gui.Gui;
 import org.bukkit.entity.Player;
@@ -7,18 +7,19 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
-@SuppressWarnings("all")
-public class GuiCloseEvent extends Event implements Cancellable {
+public class GuiOpenEvent extends Event implements Cancellable {
 
-    private boolean cancelled = false;
-    private static final HandlerList handlers = new HandlerList();
     private Gui gui;
+    private boolean cancelled = false;
     private Player player;
 
-    public GuiCloseEvent(Gui gui, Player player) {
+    private static final HandlerList handlers = new HandlerList();
+
+    public GuiOpenEvent(Gui gui, Player player) {
         setGui(gui);
         setPlayer(player);
     }
+
 
     @Override
     public boolean isCancelled() {
@@ -27,7 +28,7 @@ public class GuiCloseEvent extends Event implements Cancellable {
 
     @Override
     public void setCancelled(boolean cancel) {
-        this.cancelled = cancel;
+        cancelled = cancel;
     }
 
     @Override
@@ -44,12 +45,12 @@ public class GuiCloseEvent extends Event implements Cancellable {
         return gui;
     }
 
-    private void setGui(Gui gui) {
-        this.gui = gui;
-    }
-
     public Player getPlayer() {
         return player;
+    }
+
+    private void setGui(Gui gui) {
+        this.gui = gui;
     }
 
     private void setPlayer(Player player) {

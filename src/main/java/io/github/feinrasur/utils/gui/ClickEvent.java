@@ -1,6 +1,6 @@
 package io.github.feinrasur.utils.gui;
 
-import io.github.feinrasur.utils.gui.events.GuiClickEvent;
+import io.github.feinrasur.utils.gui.event.GuiClickEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -10,13 +10,12 @@ public abstract class ClickEvent {
     Gui gui;
     Integer slot;
     ItemStack shownItem;
-    ClickEventType clickEventType;
+    ClickType type;
 
-    public ClickEvent(Gui gui, Integer slot, ItemStack shownItem, ClickEventType clickEventType) {
+    public ClickEvent(Gui gui, Integer slot, ItemStack shownItem, ClickType type) {
         this.gui = gui;
         this.slot = slot;
         this.shownItem = shownItem;
-
 
         io.github.feinrasur.utils.gui.interfaces.ClickEvent clickEvent = new io.github.feinrasur.utils.gui.interfaces.ClickEvent() {
             @Override
@@ -25,7 +24,7 @@ public abstract class ClickEvent {
             }
         };
 
-        gui.setItem(slot, shownItem, clickEvent, clickEventType);
+        gui.setItem(slot, shownItem, type, clickEvent);
     }
 
     public abstract void setClickEvent(InventoryClickEvent event);

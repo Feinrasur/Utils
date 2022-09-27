@@ -1,5 +1,6 @@
 package io.github.feinrasur.utils.chat;
 
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.ChatColor;
@@ -9,6 +10,7 @@ import org.bukkit.entity.Player;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Deprecated
 public class Chat {
 
     public static String prefix = "";
@@ -56,5 +58,13 @@ public class Chat {
 
     public static void send(Player player, String message) {
         player.sendMessage(format(prefix + message));
+    }
+
+    public static void send(CommandSender sender, Component component) {
+        sender.sendMessage(component);
+    }
+
+    public static void send(Player player, Component component) {
+        player.sendMessage(component);
     }
 }

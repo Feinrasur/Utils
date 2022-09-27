@@ -9,7 +9,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-@SuppressWarnings("all")
 public class GuiItems {
 
     public static ItemStack convertToGui(@NotNull ItemStack item, @Nullable String name) {

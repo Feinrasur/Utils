@@ -1,8 +1,7 @@
 package io.github.feinrasur.utils.gui.interfaces;
 
-import io.github.feinrasur.utils.gui.events.GuiClickEvent;
+import io.github.feinrasur.utils.gui.event.GuiClickEvent;
 
-@SuppressWarnings("all")
 public interface ClickEvent {
     void run(GuiClickEvent event);
 }

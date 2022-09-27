@@ -68,13 +68,25 @@ public class Config {
     }
 
     public static FileConfiguration reload(String name) {
-        FileConfiguration config;
+        FileConfiguration config = null;
         if (customConfigs.containsKey(name))
             config = customConfigs.get(name);
         if (!customConfigs.containsKey(name))
             config = createCustomConfig(name);
+        customConfigs.put(name, config);
         config = YamlConfiguration.loadConfiguration(customConfigFiles.get(name));
         customConfigs.put(name, config);
         return customConfigs.get(name);
+    }
+
+    public static void reloadNF(String name) {
+        FileConfiguration config = null;
+        if (customConfigs.containsKey(name))
+            config = customConfigs.get(name);
+        if (!customConfigs.containsKey(name))
+            config = createCustomConfig(name);
+        customConfigs.put(name, config);
+        config = YamlConfiguration.loadConfiguration(customConfigFiles.get(name));
+        customConfigs.put(name, config);
     }
 }

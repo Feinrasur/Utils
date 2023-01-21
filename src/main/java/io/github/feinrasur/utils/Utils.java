@@ -23,4 +23,8 @@ public class Utils {
     public static void setDeniedCLickMessage(String s) {
         deniedCLickMessage = s;
     }
+
+    public static JavaPlugin getPlugin() {
+        return plugin;
+    }
 }

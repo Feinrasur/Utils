@@ -37,6 +37,7 @@ public abstract class Gui {
     boolean middleClickable = false;
     boolean ignoreDeniedClick = false;
     boolean editable = false;
+    boolean isUnClosable = false;
 
 
     private Inventory guiInventory;
@@ -147,6 +148,9 @@ public abstract class Gui {
             }
             if (annotation instanceof Permission permission) {
                 this.permission = permission.value();
+            }
+            if (annotation instanceof UnClosable) {
+                this.isUnClosable = true;
             }
         }
     }
@@ -462,6 +466,17 @@ public abstract class Gui {
     }
 
     /**
+     * @param slot       Set the slot for the Item
+     * @param item       item to put in the slot
+     * @param clickEvent Set the ClickEvent
+     * ClickType is ALL
+     */
+    public void setItem(@NotNull Integer slot, @NotNull ItemStack item, @NotNull ClickEvent clickEvent) {
+        guiInventory.setItem(slot, item);
+        setClickEventByType(slot, ClickType.ALL, clickEvent);
+    }
+
+    /**
      * @param slot       Set the slot for the ClickEvent
      * @param clickEvent set the ClickEvent
      * @param type       Set the type for the ClickEvent
@@ -610,6 +625,22 @@ public abstract class Gui {
     }
 
     /**
+     * @param item       item to add
+     * @param clickEvent set the ClickEvent for the item
+     * ClickType is ALL
+     * @return Slot where item got put in
+     */
+    public @Nullable Integer addItem(ItemStack item, ClickEvent clickEvent) {
+        int freeSlot = guiInventory.firstEmpty();
+        if (freeSlot >= 0) {
+            guiInventory.setItem(freeSlot, item);
+            setClickEventByType(freeSlot, ClickType.ALL, clickEvent);
+            return freeSlot;
+        }
+        return null;
+    }
+
+    /**
      * @param inventory inventory to set for the gui-inventory
      */
     public void setInventory(Inventory inventory) {
@@ -687,6 +718,13 @@ public abstract class Gui {
     }
 
     /**
+     * @return If gui is uncloseable
+     */
+    public boolean isUnClosable() {
+        return isUnClosable;
+    }
+
+    /**
      * @return Permission to open the gui
      */
     public String getPermission() {
@@ -754,6 +792,13 @@ public abstract class Gui {
      */
     public void setEditable(boolean editable) {
         this.editable = editable;
+    }
+
+    /**
+     * @param unClosable Set rule to make the opened gui unclosable
+     */
+    public void setUnClosable(boolean unClosable) {
+        this.isUnClosable = unClosable;
     }
 
     /**

@@ -160,7 +160,14 @@ public final class GUIListener implements Listener {
 
     @EventHandler
     public void onCloseGui(GuiCloseEvent event) {
-        CloseEvent closeEvent = event.getGui().getCloseEvent();
+
+        Gui gui = event.getGui();
+        if (gui.isUnClosable()) {
+            gui.open(event.getPlayer());
+            return;
+        }
+
+        CloseEvent closeEvent = gui.getCloseEvent();
         if (closeEvent != null)
             closeEvent.run(event);
     }
